@@ -1,7 +1,7 @@
 # Проект «Большое путешествие»
 
 * Студент: [Данил Музафаров](https://up.htmlacademy.ru/js2-urfu/1/user/1903037).
-* Наставник: [Владислав Зубко](https://htmlacademy.ru/profile/whatislove)
+* Наставник: [Владислав Зубко](https://htmlacademy.ru/profile/whatislove).
 
 ---
 
