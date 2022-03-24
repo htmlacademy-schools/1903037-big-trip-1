@@ -9,7 +9,7 @@ const getRandomInteger = (a = 0, b = 1) => {
 
 const generateEventType = () => {
   const eventTypes = [
-    'taxi', 'bus', 'train', 'ship', 'drive', 'flight', 
+    'taxi', 'bus', 'train', 'ship', 'drive', 'flight',
     'check-in', 'sightseeing', 'restaurant'
   ];
   const randomIndex = getRandomInteger(0, eventTypes.length - 1);
