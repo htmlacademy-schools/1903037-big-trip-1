@@ -20,7 +20,6 @@ export const render = (container, element, place) => {
       container.after(element);
       break;
   }
-}
 };
 export const createElement = (template) => {
   const newElement = document.createElement('div');
