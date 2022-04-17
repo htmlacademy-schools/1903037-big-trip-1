@@ -1,38 +1,39 @@
 import dayjs from 'dayjs';
 import {locations} from '../mock/locations';
 import {eventTypes} from '../mock/event-types';
-import {createElement} from '../render';
+import AbstractView from './abstract-view';
 
-const createAddEventItemTemplate = (tripEvent) => {
-  const {offers: offers, description, photos} = tripEvent;
-  const eventType = 'check-in';
-  const templateDatetime = dayjs().add(17, 'day').hour(12).minute(0).format('D/MM/YY HH:mm');
+const createEventItemEditTemplate = (tripEvent) => {
+  const {eventType, price, location, startDate, endDate, offers, description} = tripEvent;
+  const startDatetime = dayjs(startDate).format('D/MM/YY HH:mm ');
+  const endDatetime = dayjs(endDate).format('D/MM/YY HH:mm');
 
   const createOfferMarkup = (offer) => {
+    const isChecked = offer.isChosen ? ' checked=""' : '';
     const offerName = offer.name;
     const offerPrice = offer.price;
     const offerType = offer.type;
+
     return `<div class="event__available-offers">
                       <div class="event__offer-selector">
-                        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offerType}-1" type="checkbox" name="event-offer-${offerType}" >
+                        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offerType}-1" type="checkbox" name="event-offer-${offerType}"${isChecked}>
                         <label class="event__offer-label" for="event-offer-name-1">
                           <span class="event__offer-title">${offerName}</span>
-                          &plus;&euro;&nbsp;
+                          +€&nbsp;
                           <span class="event__offer-price">${offerPrice}</span>
                         </label>
                       </div>
     `;
   };
 
-  const createOffersListMarkup = (addableOffers) => {
-    if (addableOffers.length !== 0){
+  const createOffersListMarkup = (editedOffers) => {
+    if (editedOffers.length !== 0){
       return `<section class="event__section  event__section--offers">
-                    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-                    ${offers.map(createOfferMarkup).join('')}</section>`;
+                    <h3 class="event__section-title  event__section-title--offers">Offers</h3>${editedOffers}</section>`;
     }
     return '';
   };
-  const createPhotoMarkup = (photo) => (`<img className="event__photo" src="${photo}">`);
+
   const createLocationOption = (city) => (`<option value="${city}"></option>`);
   const createEventTypesMarkup = (types = eventTypes(), chosenEventType) => {
     const createType = (currentType) => {
@@ -45,8 +46,9 @@ const createAddEventItemTemplate = (tripEvent) => {
     };
     return types.map(createType).join('');
   };
-  const addableOffersMarkup = createOffersListMarkup(offers);
-  const photosList = photos.map(createPhotoMarkup).join('');
+
+  const editedOffersMarkup = offers.map(createOfferMarkup).join('');
+  const offersListMarkup = createOffersListMarkup(editedOffersMarkup);
   const locationOptions = locations().map(createLocationOption).join('');
   const eventTypesMarkup = createEventTypesMarkup(eventTypes(), eventType);
   const eventTypeLabel = eventType.charAt(0).toUpperCase() + eventType.slice(1);
@@ -71,65 +73,69 @@ const createAddEventItemTemplate = (tripEvent) => {
                     <label class="event__label  event__type-output" for="event-destination-1">
                       ${eventTypeLabel}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="" list="destination-list-1">
+                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${location}" list="destination-list-1">
                     <datalist id="destination-list-1">
                       ${locationOptions}
                     </datalist>
                   </div>
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-1">From</label>
-                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${templateDatetime}">
-                    &mdash;
+                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDatetime}">
+                    —
                     <label class="visually-hidden" for="event-end-time-1">To</label>
-                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${templateDatetime}">
+                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endDatetime}">
                   </div>
                   <div class="event__field-group  event__field-group--price">
                     <label class="event__label" for="event-price-1">
                       <span class="visually-hidden">Price</span>
-                      &euro;
+                      €
                     </label>
-                    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="">
+                    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
                   </div>
                   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                  <button class="event__reset-btn" type="reset">Cancel</button>
+                  <button class="event__reset-btn" type="reset">Delete</button>
+                  <button class="event__rollup-btn" type="button">
+                    <span class="visually-hidden">Open event</span>
+                  </button>
                 </header>
-                <section class="event__details">
-                  ${addableOffersMarkup}
-                  <section class="event__section  event__section--destination">
+                <section class="event__details">${offersListMarkup}<section class="event__section  event__section--destination">
                     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
                     <p class="event__destination-description">${description}</p>
-                    <div class="event__photos-container">
-                      <div class="event__photos-tape">
-                        ${photosList}
-                      </div>
-                    </div>
                   </section>
                 </section>
               </form>
             </li>`;
 };
 
-export default class AddEventItemView {
-  #element = null;
-  #event = null;
+export default class EventItemEditView extends AbstractView {
+  #tripEvent = null;
 
-  constructor(event) {
-    this.#event = event;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
+  constructor(tripEvent) {
+    super();
+    this.#tripEvent = tripEvent;
   }
 
   get template() {
-    return createAddEventItemTemplate(this.#event);
+    return createEventItemEditTemplate(this.#tripEvent);
   }
 
-  removeElement() {
-    this.#element = null;
+  setFormSubmit = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
+  }
+
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  }
+
+  setRollupClickHandler = (callback) => {
+    this._callback.setRollupClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollupClickHandler);
+  }
+
+  #rollupClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.rollupClick();
   }
 }
