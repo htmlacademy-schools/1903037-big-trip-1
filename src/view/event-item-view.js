@@ -2,7 +2,7 @@ import AbstractView from './abstract-view';
 import dayjs from 'dayjs';
 
 const createTripEventsItemTemplate = (tripEvent) => {
-  const { eventType, location, price, name, startDate, endDate, duration, offers, isFavorite } = tripEvent;
+  const { eventType, location, price, startDate, endDate, duration, offers, isFavorite } = tripEvent;
 
   const startDay = dayjs(startDate).format('MMM D');
   const beginDate = dayjs(startDate).format('YYYY-MM-D');
