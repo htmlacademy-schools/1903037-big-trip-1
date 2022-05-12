@@ -17,11 +17,12 @@ const createTripEventsItemTemplate = (tripEvent) => {
 
   const createOfferMarkup = (offer) => {
     if (offer.isChosen) {
-      // const {name, price} = offer;
+      const offerName = offer.name;
+      const offerPrice = offer.price;
       return `<li class="event__offer">
-               <span class="event__offer-title">${name}</span>
+               <span class="event__offer-title">${offerName}</span>
                &plus;&euro;&nbsp;
-               <span class="event__offer-price">${price}</span>
+               <span class="event__offer-price">${offerPrice}</span>
               </li>`;
     }
   };
