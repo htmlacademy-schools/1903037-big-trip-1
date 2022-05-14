@@ -1,27 +1,30 @@
 import dayjs from 'dayjs';
 import {locations} from './locations';
+import {nanoid} from 'nanoid';
 
 const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
+
   return Math.floor(lower + Math.random() * (upper - lower + 1));
 };
-
-const generateEventType = () => {
-  const eventTypes = [
+const generatePointType = () => {
+  const pointTypes = [
     'taxi', 'bus', 'train', 'ship', 'drive', 'flight',
     'check-in', 'sightseeing', 'restaurant'
   ];
-  const randomIndex = getRandomInteger(0, eventTypes.length - 1);
-  return eventTypes[randomIndex];
-};
 
+  const randomIndex = getRandomInteger(0, pointTypes.length - 1);
+
+  return pointTypes[randomIndex];
+};
 const generateLocation = () => {
   const cities = locations();
+
   const randomIndex = getRandomInteger(0, cities.length - 1);
+
   return cities[randomIndex];
 };
-
 const generateBeginEndDates = () => {
   const maxGap = 14;
   const startDate = dayjs()
@@ -38,16 +41,16 @@ const generateBeginEndDates = () => {
     end: endDate.toDate()
   };
 };
-
 const countDuration = (start, end) => {
   const interval = new Date(end - start);
+
   return {
     days: interval.getUTCDate() - 1,
     hours: interval.getUTCHours(),
     minutes: interval.getUTCMinutes(),
   };
-};
 
+};
 const generateDescription = () => {
   const description = [
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' +
@@ -60,13 +63,15 @@ const generateDescription = () => {
     'Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.'
   ];
   const randomIndex = getRandomInteger(0, description.length - 1);
-  return description[randomIndex];
-};
 
+  return description[randomIndex];
+
+};
 const generatePhotos = () => {
   const resultPhotosArray = [];
   for (let i = 0; i < 5; i++) {
-    resultPhotosArray[i] = `http://picsum.photos/248/152?r=${Math.random()}`;
+    resultPhotosArray[i] = 'http://picsum.photos/248/152?';
+    resultPhotosArray[i] += getRandomInteger(0, 99).toString();
   }
   return resultPhotosArray;
 };
@@ -138,10 +143,12 @@ const generateOffers = () => {
   return result;
 };
 
-export const generateTripEvent = () => {
+export const generateTripPoint = () => {
   const dates = generateBeginEndDates();
+
   return {
-    eventType: generateEventType(),
+    id: nanoid(),
+    pointType: generatePointType(),
     location: generateLocation(),
     startDate: dates.start,
     endDate: dates.end,
