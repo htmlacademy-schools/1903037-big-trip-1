@@ -1,8 +1,8 @@
 import AbstractView from './abstract-view';
 import dayjs from 'dayjs';
 
-const createTripEventsItemTemplate = (tripEvent) => {
-  const { eventType, location, price, startDate, endDate, duration, offers, isFavorite } = tripEvent;
+const createPointsItemTemplate = (tripPoint) => {
+  const {pointType, location, price, startDate, endDate, duration, offers, isFavorite } = tripPoint;
 
   const startDay = dayjs(startDate).format('MMM D');
   const beginDate = dayjs(startDate).format('YYYY-MM-D');
@@ -47,9 +47,9 @@ const createTripEventsItemTemplate = (tripEvent) => {
   <div class="event">
     <time class="event__date" datetime="${beginDate}">${startDay}</time>
     <div class="event__type">
-      <img class="event__type-icon" width="42" height="42" src="img/icons/${eventType}.png" alt="Event type icon">
+      <img class="event__type-icon" width="42" height="42" src="img/icons/${pointType}.png" alt="Event type icon">
     </div>
-    <h3 class="event__title">${eventType} ${location}</h3>
+    <h3 class="event__title">${pointType} ${location}</h3>
     <div class="event__schedule">
       <p class="event__time">
         <time class="event__start-time" datetime="${startDatetime}">${startTime}</time>
@@ -75,16 +75,16 @@ const createTripEventsItemTemplate = (tripEvent) => {
   </div>
 </li>`;
 };
-export default class EventItemView extends AbstractView {
-  #tripEvent = null;
+export default class PointItemView extends AbstractView {
+  #tripPoint = null;
 
-  constructor(tripEvent) {
+  constructor(tripPoint) {
     super();
-    this.#tripEvent = tripEvent;
+    this.#tripPoint = tripPoint;
   }
 
   get template() {
-    return createTripEventsItemTemplate(this.#tripEvent);
+    return createPointsItemTemplate(this.#tripPoint);
   }
 
   setEditClickHandler = (callback) => {
@@ -95,5 +95,15 @@ export default class EventItemView extends AbstractView {
   #editClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.editClick();
+  }
+
+  setFavoriteClickHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
+  }
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.favoriteClick();
   }
 }
